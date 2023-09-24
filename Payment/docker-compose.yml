@@ -1,0 +1,37 @@
+version: '3.9'
+services:
+  paymentapp:
+    build: .
+    image: app:django-payment
+    container_name: django_payment_container
+    ports:
+       - "8003:6000"
+    environment:
+      - DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1
+      - PORT=8000
+    command: sh -c "python manage.py runserver 0.0.0.0:6000"
+    volumes:
+      - .:/django-payment
+    depends_on:
+      - paymentdb
+
+  paymentdb:
+    image: postgres
+    ports: 
+      - "5432"
+    environment:
+      - POSTGRES_DB=nexaya_payment
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=grace_123  
+
+  paymentqueue:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: 'python -u consumer.py'
+    depends_on:
+      - paymentdb
+
+volumes:
+  postgres_data:
+    

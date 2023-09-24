@@ -1,0 +1,36 @@
+version: '3.9'
+services:
+  walletapp:
+    build: .
+    image: app:django-wallet
+    container_name: django_wallet_container
+    ports:
+       - "8002:5000"
+    environment:
+      - DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1
+      - PORT=8000
+    command: sh -c "python manage.py runserver 0.0.0.0:5000"
+    volumes:
+      - .:/django-wallet
+    depends_on:
+      - walletdb
+
+  walletdb:
+    image: postgres
+    ports: 
+      - "5432"
+    environment:
+      - POSTGRES_DB=nexaya_wallet
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=grace_123  
+
+  walletqueue:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: 'python -u consumer.py'
+    depends_on:
+      - walletdb
+
+volumes:
+  postgres_data:
