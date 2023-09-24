@@ -30,11 +30,20 @@ def payment(request):
                             transaction_ref = str(random.randint(100000, 999999)),
                             amount = request.data['amount'],
                             narration = f"Transferred {request.data['amount']} to {user_email}",
+                            status='success',
                     )
             instance.save()
             return Response({'message':'successful','account_balance':new_balance})
     except:
         #raise
+        instance = Transaction(
+                        user_email=user_email,
+                        transaction_ref = str(random.randint(100000, 999999)),
+                        amount = request.data['amount'],
+                        narration = f"Transferred {request.data['amount']} to {user_email}",
+                        status='failed',
+            )
+        instance.save()
         return Response({'error':'something went wrong, try again later'}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -53,7 +62,8 @@ def webhook_check(request,transaction_ref):
             'user_email':transaction.user_email,
             'Reference':transaction.transaction_ref,
             'amount':transaction.amount,
-            'narration':transaction.narration
+            'narration':transaction.narration,
+            'narration':transaction.status
         }
     except UserWallet.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)

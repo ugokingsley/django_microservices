@@ -30,6 +30,7 @@ class Transaction(models.Model):
     transaction_ref = models.CharField(max_length=140, blank=True, null=True)
     amount = models.DecimalField(max_digits=50, default=0, decimal_places=1)
     narration = models.CharField(max_length=140, blank=True, null=True)
+    status = models.CharField(max_length=140, blank=True, null=True, default='failed')
 
     def __str__(self):
         return str(self.user_email)
